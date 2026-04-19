@@ -65,4 +65,8 @@ public final class Localization {
     public static Localization getInstance() {
         return INSTANCE;
     }
+
+    public String plural(int count, String singularKey, String pluralKey) {
+        return common.get(count == 1 ? singularKey : pluralKey);
+    }
 }

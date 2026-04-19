@@ -1,6 +1,7 @@
 android {
-    buildToolsVersion "33.0.1"
-    compileSdkVersion 33
+    namespace 'com.apogames.logic'
+    buildToolsVersion "35.0.0"
+    compileSdk 35
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -13,17 +14,24 @@ android {
         }
 
     }
-    packagingOptions {
+    packaging {
         resources {
             excludes += ['META-INF/robovm/ios/robovm.xml']
         }
+        jniLibs {
+            useLegacyPackaging = true
+        }
     }
     defaultConfig {
-        applicationId "com.apogames.logic"
-        minSdkVersion 14
-        targetSdkVersion 33
+        applicationId "com.apogames.turingmachine"
+        minSdk 28
+        targetSdk 35
         versionCode 1
         versionName "1.0"
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     buildTypes {
         release {
@@ -84,7 +92,7 @@ task run(type: Exec) {
     }
 
     def adb = path + "/platform-tools/adb"
-    commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.apogames.logic/com.apogames.logic.AndroidLauncher'
+    commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.apogames.turingmachine/com.apogames.logic.AndroidLauncher'
 }
 
 eclipse.project.name = appName + "-android"

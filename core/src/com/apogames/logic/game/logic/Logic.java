@@ -725,8 +725,13 @@ public class Logic extends SequentiallyThinkingScreenModel {
         getMainPanel().drawString(Localization.getInstance().getCommon().get("solution_guess"), Constants.GAME_WIDTH / 2f, Constants.GAME_HEIGHT / 2f - 60, Constants.COLOR_BUTTONS_DARK, AssetLoader.font30, DrawString.MIDDLE, false, false);
 
         if (this.solved) {
-            getMainPanel().drawString(Localization.getInstance().getCommon().get("solution_congratulation_detail_1")+ " " + this.level.getCurRound() + " "+Localization.getInstance().getCommon().get("solution_congratulation_detail_2"), Constants.GAME_WIDTH / 2f, Constants.GAME_HEIGHT / 2f - 210, Constants.COLOR_BUTTONS_DARK, AssetLoader.font20, DrawString.MIDDLE, false, false);
-            getMainPanel().drawString(Localization.getInstance().getCommon().get("solution_congratulation_detail_3")+ " " + this.level.getVerifyChecks() + " "+Localization.getInstance().getCommon().get("solution_congratulation_detail_4"), Constants.GAME_WIDTH / 2f, Constants.GAME_HEIGHT / 2f - 180, Constants.COLOR_BUTTONS_DARK, AssetLoader.font20, DrawString.MIDDLE, false, false);
+            Localization loc = Localization.getInstance();
+            int rounds = this.level.getCurRound() + 1;
+            int checks = this.level.getVerifyChecks();
+            String roundWord = loc.plural(rounds, "solution_congratulation_detail_2_single", "solution_congratulation_detail_2");
+            String checkWord = loc.plural(checks, "solution_congratulation_detail_4_single", "solution_congratulation_detail_4");
+            getMainPanel().drawString(loc.getCommon().get("solution_congratulation_detail_1") + " " + rounds + " " + roundWord, Constants.GAME_WIDTH / 2f, Constants.GAME_HEIGHT / 2f - 210, Constants.COLOR_BUTTONS_DARK, AssetLoader.font20, DrawString.MIDDLE, false, false);
+            getMainPanel().drawString(loc.getCommon().get("solution_congratulation_detail_3") + " " + checks + " " + checkWord, Constants.GAME_WIDTH / 2f, Constants.GAME_HEIGHT / 2f - 180, Constants.COLOR_BUTTONS_DARK, AssetLoader.font20, DrawString.MIDDLE, false, false);
         } else {
             getMainPanel().drawString(Localization.getInstance().getCommon().get("solution_wrong_detail_1"), Constants.GAME_WIDTH / 2f, Constants.GAME_HEIGHT / 2f - 210, Constants.COLOR_BUTTONS_DARK, AssetLoader.font20, DrawString.MIDDLE, false, false);
             getMainPanel().drawString(Localization.getInstance().getCommon().get("solution_wrong_detail_2"), Constants.GAME_WIDTH / 2f, Constants.GAME_HEIGHT / 2f - 180, Constants.COLOR_BUTTONS_DARK, AssetLoader.font20, DrawString.MIDDLE, false, false);

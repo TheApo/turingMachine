@@ -12,7 +12,6 @@ import com.apogames.logic.game.logic.level.Difficulty;
 import com.apogames.logic.game.logic.level.Solution;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.sun.org.apache.bcel.internal.Const;
 
 import java.util.Locale;
 
