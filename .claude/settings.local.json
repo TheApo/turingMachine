@@ -22,7 +22,8 @@
       "Bash(dir:*)",
       "Bash(cp \"D:/workspace/settler/gradle/wrapper/gradle-wrapper.jar\" \"D:/workspace/logic/gradle/wrapper/gradle-wrapper.jar\")",
       "Bash(cp \"D:/workspace/settler/gradlew\" \"D:/workspace/logic/gradlew\")",
-      "Bash(cp \"D:/workspace/settler/gradlew.bat\" \"D:/workspace/logic/gradlew.bat\")"
+      "Bash(cp \"D:/workspace/settler/gradlew.bat\" \"D:/workspace/logic/gradlew.bat\")",
+      "Bash(python *)"
     ],
     "deny": [],
     "ask": []

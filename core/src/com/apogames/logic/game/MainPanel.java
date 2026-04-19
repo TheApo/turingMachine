@@ -11,7 +11,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 
-import java.util.Locale;
 
 public class MainPanel extends GameScreen {
 
@@ -28,11 +27,7 @@ public class MainPanel extends GameScreen {
         }
 
         Gdx.graphics.setContinuousRendering(false);
-        if (Constants.IS_HTML) {
-            Localization.getInstance().setLocale(Locale.ENGLISH);
-        } else {
-            Localization.getInstance().setLocale(Locale.getDefault());
-        }
+        Localization.getInstance().setLocale(Constants.REGION);
 
         if (this.game == null) {
             this.game = new Logic(this);

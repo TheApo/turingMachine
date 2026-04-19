@@ -8,7 +8,7 @@ Crack the code. One verifier at a time.
 
 ## What is this?
 
-**Turing Machine** is a pen-and-paper-meets-logic-puzzle board game designed by Fabien Gridel and Yoann Levet, published by Le Scorpion Masqué. You try to find a secret three-digit code by testing your guesses against a set of verifiers — each verifier answers *yes* or *no*, and from the pattern of answers you deduce the code.
+**Turing Machine** is a pen-and-paper-meets-logic-puzzle board game designed by Fabien Gridel and Yoann Levet, published by Le Scorpion Masqué. A secret three-digit code is hiding behind a set of verifiers. Each verifier knows one property of the code — something like *"first digit is greater than 3"* or *"sum of the digits is less than 12"*. None of them reveals the code directly. Only by **combining every verifier's hint** does exactly one code survive.
 
 This project is a **fan-made digital adaptation** built in Java with libGDX. It runs on Windows, Linux, macOS, Android, and directly in the browser via TeaVM.
 
@@ -23,15 +23,23 @@ This project is a **fan-made digital adaptation** built in Java with libGDX. It 
 | Plays anywhere, instantly        |     —    |       ✓      |
 | Smell of fresh cardboard         |     ✓    |       —      |
 
-## How to play (30-second primer)
+## How to play
 
-1. A secret three-digit code is hidden. Each digit is between **1** and **5**.
-2. You pick a guess, then ask a handful of **verifiers** about it.
-3. Each verifier checks one property — *"Is the first digit even?"*, *"Is the sum bigger than 6?"*, *"Does the triplet contain exactly one 3?"* …
-4. The verifier replies **yes** or **no**, but *which* verifier gave which answer is what you have to figure out.
-5. Combine the answers, eliminate the impossible, and submit the code.
+A secret three-digit code is hidden. Each digit is between **1** and **5**. Around it sits a handful of verifiers, each guarding one rule about the code.
 
-No luck. No randomness in the answers. Pure deduction.
+**Each round:**
+
+1. You enter a guess — any triple from `1 1 1` to `5 5 5`.
+2. You pick up to three verifiers to question.
+3. Each verifier compares your guess against *its own secret rule about the code* and hands back a **hint**, not an answer. Examples of what you might see:
+   - `first > 3` — the first digit of the code is greater than 3
+   - `sum < 12` — the digits of the code add up to less than 12
+   - `second = 4` — the middle digit of the code equals 4
+   - `third is even` — the last digit of the code is even
+4. No single hint solves the puzzle. You cross-reference, eliminate, and slowly box the code in.
+5. When only one code remains consistent with every hint, you submit it.
+
+**The goal:** crack the code in as few rounds and as few verifier tests as possible. Puzzles are designed so that exactly one code satisfies every verifier — no luck, no randomness, pure deduction.
 
 ## Running it
 

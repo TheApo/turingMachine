@@ -231,9 +231,7 @@ public class Menu extends SequentiallyThinkingScreenModel {
         getMainPanel().getButtonByFunction(Menu.FUNCTION_GUESS_TWO_FIRST).setVisible(true);
         getMainPanel().getButtonByFunction(Menu.FUNCTION_GUESS_TWO_SECOND).setVisible(true);
         getMainPanel().getButtonByFunction(Menu.FUNCTION_GUESS_TWO_THIRD).setVisible(true);
-        if (!Constants.IS_HTML) {
-            getMainPanel().getButtonByFunction(Menu.FUNCTION_LANGUAGE).setVisible(true);
-        }
+        getMainPanel().getButtonByFunction(Menu.FUNCTION_LANGUAGE).setVisible(true);
 
         setButtonToPosition(getMainPanel().getButtonByFunction(Menu.FUNCTION_GUESS_ONE_FIRST), this.cardOne.getX(), this.cardOne.getY(), String.valueOf(this.cardOne.getSolution().getFirst()));
         setButtonToPosition(getMainPanel().getButtonByFunction(Menu.FUNCTION_GUESS_ONE_SECOND), this.cardOne.getX() + this.cardOne.getWidth()/3, this.cardOne.getY(), String.valueOf(this.cardOne.getSolution().getSecond()));
