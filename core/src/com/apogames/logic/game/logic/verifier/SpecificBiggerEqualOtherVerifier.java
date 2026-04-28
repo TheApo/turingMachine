@@ -98,6 +98,14 @@ public class SpecificBiggerEqualOtherVerifier extends Verifier {
         return VerifyIDEnum.SpecificBiggerEqualOtherVerifier.getValue();
     }
 
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        return hitsOf(
+                first >= second && first >= third,
+                second >= first && second >= third,
+                third >= first && third >= second);
+    }
+
     public Difficulty getDifficulty() {
         return Difficulty.EXPERT;
     }

@@ -112,6 +112,11 @@ public class AllSumNumberVerifier extends Verifier {
         return VerifyIDEnum.AllSumNumberVerifier.getValue();
     }
 
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        return new int[]{ cmpCol(first + second + third, this.value) };
+    }
+
     public void renderFill(MainPanel mainPanel, int changeX, int changeY, boolean all) {
         if (all) {
             super.renderFill(mainPanel, changeX, changeY);

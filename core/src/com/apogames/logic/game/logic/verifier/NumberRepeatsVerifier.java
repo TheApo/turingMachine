@@ -90,6 +90,14 @@ public class NumberRepeatsVerifier extends Verifier {
         return VerifyIDEnum.NumberRepeatsVerifier.getValue();
     }
 
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        int r = getRepeat(first, second, third);
+        if (r == 0) return new int[]{0};
+        if (r == 1) return new int[]{1};
+        return new int[]{2};
+    }
+
     public void renderFill(MainPanel mainPanel, int changeX, int changeY, boolean all) {
         if (all) {
             super.renderFill(mainPanel, changeX, changeY);

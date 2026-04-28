@@ -143,6 +143,12 @@ public class CompareToValueVerifier extends Verifier {
         return VerifyIDEnum.CompareToValueVerifier.getValue();
     }
 
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        int v = isFirst() ? first : isSecond() ? second : third;
+        return new int[]{ cmpCol(v, this.value) };
+    }
+
     public void renderFill(MainPanel mainPanel, int changeX, int changeY, boolean all) {
         if (all) {
             super.renderFill(mainPanel, changeX, changeY);

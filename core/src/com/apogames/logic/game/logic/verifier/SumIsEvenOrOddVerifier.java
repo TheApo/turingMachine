@@ -70,6 +70,11 @@ public class SumIsEvenOrOddVerifier extends Verifier {
         return VerifyIDEnum.SumIsEvenOrOddVerifier.getValue();
     }
 
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        return new int[]{ (first + second + third) % 2 == 0 ? 0 : 1 };
+    }
+
     public void renderFill(MainPanel mainPanel, int changeX, int changeY, boolean all) {
         if (all) {
             super.renderFill(mainPanel, changeX, changeY);

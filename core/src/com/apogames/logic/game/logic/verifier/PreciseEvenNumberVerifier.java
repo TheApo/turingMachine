@@ -77,6 +77,11 @@ public class PreciseEvenNumberVerifier extends Verifier {
         return VerifyIDEnum.PreciseEvenNumberVerifier.getValue();
     }
 
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        return new int[]{ countAmount(first, second, third) };
+    }
+
     public void renderFill(MainPanel mainPanel, int changeX, int changeY, boolean all) {
         if (all) {
             super.renderFill(mainPanel, changeX, changeY);

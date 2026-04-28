@@ -100,6 +100,17 @@ public class DoubleSumNumberVerifier extends Verifier {
         return VerifyIDEnum.DoubleSumNumberVerifier.getValue();
     }
 
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        int sum;
+        if (isFirst()) {
+            sum = isThird() ? first + third : first + second;
+        } else {
+            sum = second + third;
+        }
+        return new int[]{ cmpCol(sum, this.value) };
+    }
+
     public void renderFill(MainPanel mainPanel, int changeX, int changeY, boolean all) {
         if (all) {
             super.renderFill(mainPanel, changeX, changeY);

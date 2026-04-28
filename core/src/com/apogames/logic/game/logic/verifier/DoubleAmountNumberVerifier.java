@@ -115,6 +115,34 @@ public class DoubleAmountNumberVerifier extends Verifier {
         return VerifyIDEnum.DoubleAmountNumberVerifier.getValue();
     }
 
+    @Override
+    public int getRows() {
+        return 2;
+    }
+
+    @Override
+    public int[] getRowYOffsets() {
+        return TWO_ROW_Y_OFFSETS;
+    }
+
+    @Override
+    public int getCellHeight() {
+        return 35;
+    }
+
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        int cols = getColumn();
+        int amountValue = getAmountFor(this.value, first, second, third);
+        int amountSecond = getAmountFor(this.secondValue, first, second, third);
+        return new int[] {
+                0 * cols + amountValue,
+                1 * cols + amountSecond
+        };
+    }
+
+    private static final int[] TWO_ROW_Y_OFFSETS = {125, 160};
+
     public Difficulty getDifficulty() {
         return Difficulty.EXPERT;
     }

@@ -136,6 +136,19 @@ public class CompareToOtherVerifier extends Verifier {
         return VerifyIDEnum.CompareToOtherVerifier.getValue();
     }
 
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        int a, b;
+        if (isFirst() && isSecond()) {
+            a = first; b = second;
+        } else if (isFirst() && isThird()) {
+            a = first; b = third;
+        } else {
+            a = second; b = third;
+        }
+        return new int[]{ cmpCol(a, b) };
+    }
+
     public void renderFill(MainPanel mainPanel, int changeX, int changeY, boolean all) {
         if (all) {
             super.renderFill(mainPanel, changeX, changeY);

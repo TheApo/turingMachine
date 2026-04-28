@@ -105,6 +105,34 @@ public class IsSmallestOrLargestVerifier extends Verifier {
         return VerifyIDEnum.IsSmallestOrLargestVerifier.getValue();
     }
 
+    @Override
+    public int getRows() {
+        return 2;
+    }
+
+    @Override
+    public int[] getRowYOffsets() {
+        return TWO_ROW_Y_OFFSETS;
+    }
+
+    @Override
+    public int getCellHeight() {
+        return 35;
+    }
+
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        return hitsOf(
+                first < second && first < third,
+                second < first && second < third,
+                third < first && third < second,
+                first > second && first > third,
+                second > first && second > third,
+                third > first && third > second);
+    }
+
+    private static final int[] TWO_ROW_Y_OFFSETS = {125, 160};
+
     public Difficulty getDifficulty() {
         return Difficulty.EXPERT;
     }

@@ -95,6 +95,12 @@ public class SumMultiplerValueVerifier extends Verifier {
         return VerifyIDEnum.SumMultiplerValueVerifier.getValue();
     }
 
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        int s = first + second + third;
+        return hitsOf(s % 3 == 0, s % 4 == 0, s % 5 == 0);
+    }
+
     public Difficulty getDifficulty() {
         return Difficulty.EXPERT;
     }

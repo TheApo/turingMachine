@@ -132,13 +132,19 @@ public class Logic extends SequentiallyThinkingScreenModel {
         int myY = this.startY;
         int index = 0;
         for (Verifier verify : this.level.getVerifiers()) {
-            for (int i = 0; i < verify.getColumn(); i++) {
-                int curX = (int)(myX + (float)width / verify.getColumn() * i);
-                int curY = myY + 125;
-                int curWidth = width / verify.getColumn();
-                int curHeight = 70;
-                String function = FUNCTION_VERIFIER_START + index + "_" + i;
-                getMainPanel().getButtons().add(new ApoButtonOnlyX(curX, curY, curWidth, curHeight, function, Constants.COLOR_RED, Constants.COLOR_YELLOW));
+            int cols = verify.getColumn();
+            int rows = verify.getRows();
+            int[] rowYOffsets = verify.getRowYOffsets();
+            int cellHeight = verify.getCellHeight();
+            int cellWidth = width / cols;
+            for (int row = 0; row < rows; row++) {
+                for (int col = 0; col < cols; col++) {
+                    int curX = (int)(myX + (float)width / cols * col);
+                    int curY = myY + rowYOffsets[row];
+                    int cellIdx = row * cols + col;
+                    String function = FUNCTION_VERIFIER_START + index + "_" + cellIdx;
+                    getMainPanel().getButtons().add(new ApoButtonOnlyX(curX, curY, cellWidth, cellHeight, function, Constants.COLOR_RED, Constants.COLOR_YELLOW));
+                }
             }
             index += 1;
             myX += width;
@@ -215,11 +221,19 @@ public class Logic extends SequentiallyThinkingScreenModel {
             if (step == Step.QUESTION) {
                 String sub = function.substring(function.lastIndexOf("_") + 1);
                 int index = Integer.parseInt(sub) - 1;
-                this.level.getRounds()[this.level.getCurRound()].getVerifier()[index] = this.level.getVerifiers().get(index).check(this.level.getGuess().getFirst(), this.level.getGuess().getSecond(), this.level.getGuess().getThird());
-                if (!this.level.isTippAlreadyIn(this.level.getVerifiers().get(index).getCheck(), index)) {
-                    this.level.getRounds()[this.level.getCurRound()].getTipp()[index] = this.level.getVerifiers().get(index).getCheck();
+                Verifier verifier = this.level.getVerifiers().get(index);
+                int first = this.level.getGuess().getFirst();
+                int second = this.level.getGuess().getSecond();
+                int third = this.level.getGuess().getThird();
+                boolean result = verifier.check(first, second, third);
+                this.level.getRounds()[this.level.getCurRound()].getVerifier()[index] = result;
+                if (!this.level.isTippAlreadyIn(verifier.getCheck(), index)) {
+                    this.level.getRounds()[this.level.getCurRound()].getTipp()[index] = verifier.getCheck();
                 }
                 getMainPanel().getButtonByFunction(function).setVisible(false);
+                if (this.help) {
+                    applyHelpAutoX(verifier, index, result, first, second, third);
+                }
                 askedEnough();
             }
         } else {
@@ -268,6 +282,26 @@ public class Logic extends SequentiallyThinkingScreenModel {
         this.solved = this.level.getSolution().isSame(this.level.getGuess());
         this.level.fillLastCheck();
         this.solutionCard = new Card(this.level.getSolution().getCopy(), 0, 0, 180, 240, true);
+    }
+
+    private void applyHelpAutoX(Verifier verifier, int verifierIndex, boolean result, int first, int second, int third) {
+        int totalCells = verifier.getRows() * verifier.getColumn();
+        int[] hits = verifier.getCellsForGuess(first, second, third);
+        boolean[] isHit = new boolean[totalCells];
+        for (int h : hits) {
+            if (h >= 0 && h < totalCells) {
+                isHit[h] = true;
+            }
+        }
+        for (int cell = 0; cell < totalCells; cell++) {
+            boolean shouldX = result ? !isHit[cell] : isHit[cell];
+            if (shouldX) {
+                ApoButton btn = getMainPanel().getButtonByFunction(FUNCTION_VERIFIER_START + verifierIndex + "_" + cell);
+                if (btn != null) {
+                    btn.setSelect(true);
+                }
+            }
+        }
     }
 
     private void askedEnough() {

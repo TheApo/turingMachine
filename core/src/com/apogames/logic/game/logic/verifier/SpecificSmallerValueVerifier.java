@@ -115,6 +115,11 @@ public class SpecificSmallerValueVerifier extends Verifier {
         return VerifyIDEnum.SpecificSmallerValueVerifier.getValue();
     }
 
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        return hitsOf(first < this.value, second < this.value, third < this.value);
+    }
+
     public Difficulty getDifficulty() {
         return Difficulty.EXPERT;
     }

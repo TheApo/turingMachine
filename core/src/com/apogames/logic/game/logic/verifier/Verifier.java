@@ -109,6 +109,58 @@ public abstract class Verifier {
 
     public abstract boolean check(int first, int second, int third, ArrayList<Solution> possibleSolutions, int index);
 
+    /**
+     * Number of answer rows on the verifier card. Default 1 (single-row).
+     */
+    public int getRows() {
+        return 1;
+    }
+
+    /**
+     * Y-offset (relative to the verifier card top) for each answer row. Length must equal getRows().
+     */
+    public int[] getRowYOffsets() {
+        return DEFAULT_ROW_OFFSETS;
+    }
+
+    /**
+     * Pixel height of one answer cell.
+     */
+    public int getCellHeight() {
+        return DEFAULT_CELL_HEIGHT;
+    }
+
+    /**
+     * Returns the cell indices (row * getColumn() + col) that the given guess satisfies.
+     * A returned cell is "hit": if check() returned true, the rule lies among the hit cells;
+     * if check() returned false, the rule is none of the hit cells.
+     */
+    public abstract int[] getCellsForGuess(int first, int second, int third);
+
+    private static final int[] DEFAULT_ROW_OFFSETS = {125};
+    private static final int DEFAULT_CELL_HEIGHT = 70;
+
+    /**
+     * 0 if a < b, 1 if a == b, 2 if a > b. Reused by many verifiers.
+     */
+    protected static int cmpCol(int a, int b) {
+        return a < b ? 0 : a == b ? 1 : 2;
+    }
+
+    /**
+     * Builds a hit-cell array from per-cell booleans. cellHits[i] = true marks cell index i as hit.
+     */
+    protected static int[] hitsOf(boolean... cellHits) {
+        int count = 0;
+        for (boolean b : cellHits) if (b) count++;
+        int[] out = new int[count];
+        int idx = 0;
+        for (int i = 0; i < cellHits.length; i++) {
+            if (cellHits[i]) out[idx++] = i;
+        }
+        return out;
+    }
+
     public abstract String getText();
 
     public abstract String getName();

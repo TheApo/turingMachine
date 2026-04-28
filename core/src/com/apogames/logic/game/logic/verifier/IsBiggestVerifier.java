@@ -110,6 +110,14 @@ public class IsBiggestVerifier extends Verifier {
         return VerifyIDEnum.IsBiggestVerifier.getValue();
     }
 
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        if (first > second && first > third) return new int[]{0};
+        if (second > first && second > third) return new int[]{1};
+        if (third > first && third > second) return new int[]{2};
+        return new int[0];
+    }
+
     public Difficulty getDifficulty() {
         return Difficulty.MEDIUM;
     }

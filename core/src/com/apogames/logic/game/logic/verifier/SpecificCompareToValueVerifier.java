@@ -128,6 +128,34 @@ public class SpecificCompareToValueVerifier extends Verifier {
         return VerifyIDEnum.SpecificCompareToValueVerifier.getValue();
     }
 
+    @Override
+    public int getRows() {
+        return 3;
+    }
+
+    @Override
+    public int[] getRowYOffsets() {
+        return ROW_Y_OFFSETS;
+    }
+
+    @Override
+    public int getCellHeight() {
+        return 25;
+    }
+
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        int[] arr = { first, second, third };
+        int[] hits = new int[arr.length];
+        for (int col = 0; col < arr.length; col++) {
+            int row = cmpCol(arr[col], this.value);
+            hits[col] = row * getColumn() + col;
+        }
+        return hits;
+    }
+
+    private static final int[] ROW_Y_OFFSETS = {122, 147, 172};
+
     public Difficulty getDifficulty() {
         return Difficulty.EXPERT;
     }

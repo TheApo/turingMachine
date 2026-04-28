@@ -82,6 +82,12 @@ public class SmallerValueVerifier extends Verifier {
         return VerifyIDEnum.SmallerValueVerifier.getValue();
     }
 
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        boolean any = first < this.value || second < this.value || third < this.value;
+        return new int[]{ any ? 0 : 1 };
+    }
+
     public Difficulty getDifficulty() {
         return Difficulty.MEDIUM;
     }

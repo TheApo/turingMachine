@@ -116,6 +116,12 @@ public class OddEvenGeneralVerifier extends Verifier {
         return VerifyIDEnum.OddEvenGeneralVerifier.getValue();
     }
 
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        int evens = (first % 2 == 0 ? 1 : 0) + (second % 2 == 0 ? 1 : 0) + (third % 2 == 0 ? 1 : 0);
+        return new int[]{ evens > 1 ? 0 : 1 };
+    }
+
     public void renderFill(MainPanel mainPanel, int changeX, int changeY, boolean all) {
         if (all) {
             super.renderFill(mainPanel, changeX, changeY);

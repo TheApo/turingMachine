@@ -118,6 +118,12 @@ public class OddEvenValueVerifier extends Verifier {
         return VerifyIDEnum.OddEvenValueVerifier.getValue();
     }
 
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        int v = isFirst() ? first : isSecond() ? second : third;
+        return new int[]{ v % 2 == 0 ? 0 : 1 };
+    }
+
     public void renderFill(MainPanel mainPanel, int changeX, int changeY, boolean all) {
         if (all) {
             super.renderFill(mainPanel, changeX, changeY);

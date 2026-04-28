@@ -106,6 +106,11 @@ public class InAndDecreasingVerifier extends Verifier {
         return VerifyIDEnum.InAndDecreasingVerifier.getValue();
     }
 
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        return new int[]{ getInAndDecreasing(first, second, third) };
+    }
+
     public Difficulty getDifficulty() {
         return Difficulty.MEDIUM;
     }

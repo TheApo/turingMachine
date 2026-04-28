@@ -91,6 +91,11 @@ public class OrderVerifier extends Verifier {
         return VerifyIDEnum.OrderVerifier.getValue();
     }
 
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        return new int[]{ getOrder(first, second, third) };
+    }
+
     public Difficulty getDifficulty() {
         return Difficulty.MEDIUM;
     }

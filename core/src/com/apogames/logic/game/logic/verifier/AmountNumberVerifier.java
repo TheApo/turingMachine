@@ -128,6 +128,12 @@ public class AmountNumberVerifier extends Verifier {
         return VerifyIDEnum.AmountNumberVerifier.getValue();
     }
 
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        int amount = (first == this.value ? 1 : 0) + (second == this.value ? 1 : 0) + (third == this.value ? 1 : 0);
+        return new int[]{ amount };
+    }
+
     public void renderFill(MainPanel mainPanel, int changeX, int changeY, boolean all) {
         if (all) {
             super.renderFill(mainPanel, changeX, changeY);

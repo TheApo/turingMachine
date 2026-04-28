@@ -95,6 +95,11 @@ public class DecreasingVerifier extends Verifier {
         return VerifyIDEnum.DecreasingVerifier.getValue();
     }
 
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        return new int[]{ getDecreasing(first, second, third) };
+    }
+
     public Difficulty getDifficulty() {
         return Difficulty.MEDIUM;
     }

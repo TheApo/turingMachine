@@ -86,6 +86,11 @@ public class PairVerifier extends Verifier {
         return VerifyIDEnum.PairVerifier.getValue();
     }
 
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        return new int[]{ getPair(first, second, third) == 1 ? 1 : 0 };
+    }
+
     public void renderFill(MainPanel mainPanel, int changeX, int changeY, boolean all) {
         if (all) {
             super.renderFill(mainPanel, changeX, changeY);

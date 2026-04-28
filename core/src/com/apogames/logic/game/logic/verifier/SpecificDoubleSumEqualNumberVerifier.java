@@ -117,6 +117,13 @@ public class SpecificDoubleSumEqualNumberVerifier extends Verifier {
         return VerifyIDEnum.SpecificDoubleSumEqualNumberVerifier.getValue();
     }
 
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        return hitsOf(first + second == this.value,
+                      first + third == this.value,
+                      second + third == this.value);
+    }
+
     public Difficulty getDifficulty() {
         return Difficulty.EXPERT;
     }

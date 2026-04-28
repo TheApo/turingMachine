@@ -144,6 +144,48 @@ public class SpecificCompareToOtherVerifier extends Verifier {
         return VerifyIDEnum.SpecificCompareToOtherVerifier.getValue();
     }
 
+    @Override
+    public int getRows() {
+        return 2;
+    }
+
+    @Override
+    public int[] getRowYOffsets() {
+        return TWO_ROW_Y_OFFSETS;
+    }
+
+    @Override
+    public int getCellHeight() {
+        return 35;
+    }
+
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        int[] arr = { first, second, third };
+        int[] rowOthers = getRowOthers();
+        int cols = getColumn();
+        int[] hits = new int[2];
+        for (int row = 0; row < 2; row++) {
+            int a = arr[this.show - 1];
+            int b = arr[rowOthers[row] - 1];
+            hits[row] = row * cols + cmpCol(a, b);
+        }
+        return hits;
+    }
+
+    private int[] getRowOthers() {
+        int two = getOtherIcon();
+        int[] out = new int[2];
+        out[0] = two;
+        two += 1;
+        if (two == this.show) two += 1;
+        if (two > 3) two = 1;
+        out[1] = two;
+        return out;
+    }
+
+    private static final int[] TWO_ROW_Y_OFFSETS = {125, 160};
+
     public Difficulty getDifficulty() {
         return Difficulty.EXPERT;
     }

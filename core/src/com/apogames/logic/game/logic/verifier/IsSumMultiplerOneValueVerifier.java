@@ -83,6 +83,11 @@ public class IsSumMultiplerOneValueVerifier extends Verifier {
         return VerifyIDEnum.IsSumMultiplerOneValueVerifier.getValue();
     }
 
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        return new int[]{ (first + second + third) % this.value == 0 ? 0 : 1 };
+    }
+
     public Difficulty getDifficulty() {
         return Difficulty.MEDIUM;
     }

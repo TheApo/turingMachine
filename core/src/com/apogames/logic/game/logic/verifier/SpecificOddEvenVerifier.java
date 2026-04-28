@@ -95,6 +95,35 @@ public class SpecificOddEvenVerifier extends Verifier {
         return VerifyIDEnum.SpecificOddEvenVerifier.getValue();
     }
 
+    @Override
+    public int getRows() {
+        return 2;
+    }
+
+    @Override
+    public int[] getRowYOffsets() {
+        return TWO_ROW_Y_OFFSETS;
+    }
+
+    @Override
+    public int getCellHeight() {
+        return 35;
+    }
+
+    @Override
+    public int[] getCellsForGuess(int first, int second, int third) {
+        int[] arr = { first, second, third };
+        int cols = getColumn();
+        int[] hits = new int[arr.length];
+        for (int col = 0; col < arr.length; col++) {
+            int row = arr[col] % 2 == 0 ? 0 : 1;
+            hits[col] = row * cols + col;
+        }
+        return hits;
+    }
+
+    private static final int[] TWO_ROW_Y_OFFSETS = {125, 160};
+
     public Difficulty getDifficulty() {
         return Difficulty.EXPERT;
     }
