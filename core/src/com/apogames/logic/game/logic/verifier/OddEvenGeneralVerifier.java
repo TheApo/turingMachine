@@ -95,7 +95,7 @@ public class OddEvenGeneralVerifier extends Verifier {
             countEven += 1;
         }
 
-        if ((odd && countEven <= 1) || (!odd && countEven > 1)) {
+        if ((odd && countEven > 1) || (!odd && countEven <= 1)) {
             possibleSolutions.remove(index);
         }
 

@@ -11,6 +11,10 @@ public class VerifierHelper {
 
     ArrayList<Verifier> allVerifiers = new ArrayList<>();
 
+    public ArrayList<Verifier> getAllVerifiers() {
+        return allVerifiers;
+    }
+
     public VerifierHelper(Solution solution) {
         this.setAllVerifiers(solution);
     }
