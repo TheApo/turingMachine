@@ -621,6 +621,7 @@ public class Tutorial extends Logic {
 
     @Override
     protected void quit() {
+        this.tutorialStep = TutorialStep.DONE;
         ApoButton next = getMainPanel().getButtonByFunction(FUNCTION_TUTORIAL_NEXT);
         if (next != null) next.setVisible(false);
         super.quit();
