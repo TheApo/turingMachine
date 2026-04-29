@@ -34,6 +34,20 @@ public class Level {
         this.setNewSolution(difficulty);
     }
 
+    public Level(final int amount, Solution solution, ArrayList<Verifier> verifiers) {
+        this.amount = amount;
+
+        this.rounds = new Round[12];
+        for (int i = 0; i < this.rounds.length; i++) {
+            this.rounds[i] = new Round(i+1);
+        }
+
+        this.solution = solution;
+        this.guess = new Solution(1, 2, 3);
+        this.verifiers = verifiers;
+        this.lastChecks = new boolean[this.verifiers.size()];
+    }
+
     public boolean isTippAlreadyIn(String newTipp, int verifierIndex) {
         for (Round round : this.rounds) {
             if (round.getTipp() != null && newTipp.equals(round.getTipp()[verifierIndex])) {

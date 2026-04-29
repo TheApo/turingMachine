@@ -20,6 +20,7 @@ public class Menu extends SequentiallyThinkingScreenModel {
     public static final String FUNCTION_BACK = "QUIT";
 
     public static final String FUNCTION_PLAY = "PLAY";
+    public static final String FUNCTION_TUTORIAL = "TUTORIAL";
 
     public static final String FUNCTION_LANGUAGE = "LANGUAGE";
 
@@ -179,6 +180,9 @@ public class Menu extends SequentiallyThinkingScreenModel {
             case Menu.FUNCTION_PLAY:
                 this.getMainPanel().changeToGame(this.curVerifier, this.curDifficulty);
                 break;
+            case Menu.FUNCTION_TUTORIAL:
+                this.getMainPanel().changeToTutorial();
+                break;
             case Menu.FUNCTION_LANGUAGE:
                 this.german = !this.german;
 
@@ -221,6 +225,7 @@ public class Menu extends SequentiallyThinkingScreenModel {
 
         getMainPanel().getButtonByFunction(Menu.FUNCTION_BACK).setVisible(true);
         getMainPanel().getButtonByFunction(Menu.FUNCTION_PLAY).setVisible(true);
+        getMainPanel().getButtonByFunction(Menu.FUNCTION_TUTORIAL).setVisible(true);
         getMainPanel().getButtonByFunction(Menu.FUNCTION_VERIFIER_LEFT).setVisible(true);
         getMainPanel().getButtonByFunction(Menu.FUNCTION_VERIFIER_RIGHT).setVisible(true);
         getMainPanel().getButtonByFunction(Menu.FUNCTION_DIFFICULTY_LEFT).setVisible(true);

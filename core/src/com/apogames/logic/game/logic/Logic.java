@@ -93,6 +93,10 @@ public class Logic extends SequentiallyThinkingScreenModel {
         this.amount = amount;
     }
 
+    public int getAmount() {
+        return amount;
+    }
+
     public Difficulty getDifficulty() {
         return difficulty;
     }
@@ -101,9 +105,25 @@ public class Logic extends SequentiallyThinkingScreenModel {
         this.difficulty = difficulty;
     }
 
-    private void setNewLevel() {
+    public Level getLevel() {
+        return level;
+    }
+
+    public Step getStep() {
+        return step;
+    }
+
+    public boolean isHelp() {
+        return help;
+    }
+
+    protected Level createLevel() {
+        return (new ApoSolver()).getNextLevel(this.amount, this.difficulty);
+    }
+
+    protected void setNewLevel() {
         this.step = Step.PROPOSOL;
-        this.level = (new ApoSolver()).getNextLevel(this.amount, this.difficulty);//new Level(this.amount, this.difficulty);
+        this.level = createLevel();
         this.showResult = false;
         this.solved = false;
         getMainPanel().getButtonByFunction(Logic.FUNCTION_STEP_TO_NEXT).setText("Verify");
@@ -325,7 +345,7 @@ public class Logic extends SequentiallyThinkingScreenModel {
         }
     }
 
-    private void nextStep() {
+    protected void nextStep() {
         if (this.step == Step.PROPOSOL) {
             ArrayList<ApoButton> buttonByStartingFunction = this.getButtonByStartingFunction(FUNCTION_VERIFIER);
             for (int i = 0; i < buttonByStartingFunction.size() && i < this.level.getAmount(); i++) {

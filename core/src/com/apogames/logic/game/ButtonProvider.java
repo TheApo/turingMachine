@@ -35,6 +35,7 @@ import com.apogames.logic.entity.ApoButtonColor;
 import com.apogames.logic.entity.ApoButtonTuringNumber;
 import com.apogames.logic.game.logic.Logic;
 import com.apogames.logic.game.menu.Menu;
+import com.apogames.logic.game.tutorial.Tutorial;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 public class ButtonProvider {
@@ -84,6 +85,17 @@ public class ButtonProvider {
 			//ApoButtonColor(x, y, width, height, function, text, Constants.COLOR_BACKGROUND, Constants.COLOR_WHITE);
 			button.setStroke(1);
 			button.setFont(AssetLoader.font30);
+			this.game.getButtons().add(button);
+
+			text = "Tutorial";
+			function = Menu.FUNCTION_TUTORIAL;
+			width = 164;
+			height = 64;
+			x = Constants.GAME_WIDTH/2 - width/2;
+			y = Constants.GAME_HEIGHT/2 + 130 + 50 + 80 + 25;
+			button = new ApoButtonColor(x, y, width, height, function, text, Constants.COLOR_BUTTONS_DARK, Constants.COLOR_WHITE, "button_tutorial");
+			button.setStroke(1);
+			button.setFont(AssetLoader.font25);
 			this.game.getButtons().add(button);
 
 			text = "<";
@@ -307,6 +319,17 @@ public class ButtonProvider {
 			y = Constants.GAME_HEIGHT - height - 5;
 			button = new ApoButtonColor(x, y, width, height, function, text, Constants.COLOR_BUTTONS, Constants.COLOR_BUTTONS_DARK);
 			button.setFont(AssetLoader.font30);
+			this.game.getButtons().add(button);
+
+			text = "Next";
+			function = Tutorial.FUNCTION_TUTORIAL_NEXT;
+			width = 220;
+			height = 50;
+			x = 0;
+			y = 0;
+			button = new ApoButtonColor(x, y, width, height, function, text, Constants.COLOR_BUTTONS_DARK, Constants.COLOR_WHITE, "button_tutorial_next");
+			button.setStroke(1);
+			button.setFont(AssetLoader.font25);
 			this.game.getButtons().add(button);
 
 			for (int i = 0; i < this.game.getButtons().size(); i++) {

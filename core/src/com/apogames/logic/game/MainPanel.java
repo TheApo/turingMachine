@@ -7,6 +7,7 @@ import com.apogames.logic.common.Localization;
 import com.apogames.logic.game.logic.Logic;
 import com.apogames.logic.game.logic.level.Difficulty;
 import com.apogames.logic.game.menu.Menu;
+import com.apogames.logic.game.tutorial.Tutorial;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -16,7 +17,8 @@ public class MainPanel extends GameScreen {
 
     private Logic game;
     private Menu menu;
-    
+    private Tutorial tutorial;
+
     private FPSLogger logger = new FPSLogger();
 
     public MainPanel() {
@@ -35,6 +37,9 @@ public class MainPanel extends GameScreen {
         if (this.menu == null) {
             this.menu = new Menu(this);
         }
+        if (this.tutorial == null) {
+            this.tutorial = new Tutorial(this);
+        }
 
         this.changeToMenu();
     }
@@ -47,6 +52,10 @@ public class MainPanel extends GameScreen {
 
     public void changeToMenu() {
         this.changeModel(this.menu);
+    }
+
+    public void changeToTutorial() {
+        this.changeModel(this.tutorial);
     }
 
     /**
