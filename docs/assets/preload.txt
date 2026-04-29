@@ -32,9 +32,9 @@ i:b:/fonts_old/pirate33.fnt:11107:1
 i:b:/fonts_old/pirate33.png:24283:1
 i:b:/fonts_old/pirate40.fnt:11107:1
 i:b:/fonts_old/pirate40.png:28739:1
-i:b:/i18n/turingMachine.properties:1781:1
-i:b:/i18n/turingMachine_de.properties:16022:1
-i:b:/i18n/turingMachine_en.properties:15084:1
+i:b:/i18n/turingMachine.properties:18959:1
+i:b:/i18n/turingMachine_de.properties:20365:1
+i:b:/i18n/turingMachine_en.properties:18959:1
 c:b:/com/badlogic/gdx/utils/lsans-15.png:10270:1
 c:b:/com/badlogic/gdx/graphics/g3d/shaders/default.vertex.glsl:9096:1
 c:b:/com/badlogic/gdx/graphics/g3d/particles/particles.fragment.glsl:820:1
