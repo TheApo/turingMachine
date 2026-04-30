@@ -38,14 +38,28 @@ public class SpecificSmallerValueVerifier extends Verifier {
     }
 
     @Override
+    public java.util.List<Verifier> getAllConfigurations(Solution sol) {
+        java.util.List<Verifier> list = new java.util.ArrayList<>();
+        list.add(new SpecificSmallerValueVerifier(sol, true, false, false, this.value));
+        list.add(new SpecificSmallerValueVerifier(sol, false, true, false, this.value));
+        list.add(new SpecificSmallerValueVerifier(sol, false, false, true, this.value));
+        return list;
+    }
+
+    @Override
+    public int[] getConfigCells() {
+        if (isFirst()) return new int[]{0};
+        if (isSecond()) return new int[]{1};
+        return new int[]{2};
+    }
+
+    @Override
     public boolean check(int first, int second, int third) {
         return check(first, second, third, null, -1);
     }
 
     @Override
     public boolean check(int first, int second, int third, ArrayList<Solution> possibleSolutions, int index) {
-        com.apogames.logic.common.Localization loc = com.apogames.logic.common.Localization.getInstance();
-
         this.setCheck("");
 
         boolean check = false;
@@ -55,47 +69,20 @@ public class SpecificSmallerValueVerifier extends Verifier {
         if (isSecond() && second < this.value) {
             check = getSolution().getSecond() < this.value;
         }
-
         if (isThird() && third < this.value) {
             check = getSolution().getThird() < this.value;
         }
 
-        String result = "";
-        if (check) {
-            if (first < this.value) {
-                result += "first < "+this.value;
-            } else {
-                result += "first >= "+this.value;
-            }
-            if (second < this.value) {
-                result += " " + loc.getCommon().get("common_or") + " second < "+this.value;
-            } else {
-                result += " " + loc.getCommon().get("common_or") + " second >= "+this.value;
-            }
-            if (third < this.value) {
-                result += " " + loc.getCommon().get("common_or") + " third < "+this.value;
-            } else {
-                result += " " + loc.getCommon().get("common_or") + " third >= "+this.value;
-            }
-        } else {
-            if (first < this.value) {
-                result += "first >= "+this.value;
-            } else {
-                result += "first < "+this.value;
-            }
-            if (second < this.value) {
-                result += " " + loc.getCommon().get("common_or") + " second >= "+this.value;
-            } else {
-                result += " " + loc.getCommon().get("common_or") + " second < "+this.value;
-            }
-            if (third < this.value) {
-                result += " " + loc.getCommon().get("common_or") + " third >= "+this.value;
-            } else {
-                result += " " + loc.getCommon().get("common_or") + " third < "+this.value;
-            }
+        String[] names = {"first", "second", "third"};
+        boolean[] hits = {first < this.value, second < this.value, third < this.value};
+        String op = check ? "<" : ">=";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 3; i++) {
+            if (!hits[i]) continue;
+            if (sb.length() > 0) sb.append(hitSeparator());
+            sb.append(names[i]).append(" ").append(op).append(" ").append(this.value);
         }
-
-        this.setCheck(result);
+        this.setCheck(sb.toString());
         return check;
     }
 

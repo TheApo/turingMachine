@@ -28,6 +28,14 @@ task verifierCheck(dependsOn: classes, type: JavaExec) {
     ignoreExitValue = true
 }
 
+task solverDebug(dependsOn: classes, type: JavaExec) {
+    mainClass.set("com.apogames.logic.SolverDebugTest")
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = project.assetsDir
+    ignoreExitValue = true
+}
+
 task debug(dependsOn: classes, type: JavaExec) {
     mainClass.set(project.mainClassName)
     classpath = sourceSets.main.runtimeClasspath

@@ -41,6 +41,21 @@ public class DoubleAmountNumberVerifier extends Verifier {
         return verifier;
     }
 
+    @Override
+    public java.util.List<Verifier> getAllConfigurations(Solution sol) {
+        java.util.List<Verifier> list = new java.util.ArrayList<>();
+        list.add(new DoubleAmountNumberVerifier(sol, this.value, this.secondValue, true));
+        list.add(new DoubleAmountNumberVerifier(sol, this.value, this.secondValue, false));
+        return list;
+    }
+
+    @Override
+    public int[] getConfigCells() {
+        // 2 rows × 4 cols. chooseFirstValue=true → row 0 (cells 0..3), false → row 1 (cells 4..7)
+        if (this.chooseFirstValue) return new int[]{0, 1, 2, 3};
+        return new int[]{4, 5, 6, 7};
+    }
+
     public int getValue() {
         return value;
     }
@@ -59,19 +74,16 @@ public class DoubleAmountNumberVerifier extends Verifier {
         int amountSecond = getAmountFor(this.secondValue, first, second, third);
         int amountSolutionSecond = getAmountFor(this.secondValue, getSolution().getFirst(), getSolution().getSecond(), getSolution().getThird());
 
-        com.apogames.logic.common.Localization loc = com.apogames.logic.common.Localization.getInstance();
+        boolean check = chooseFirstValue ? amount == amountSolution : amountSecond == amountSolutionSecond;
 
-        if ((amount == amountSolution && this.chooseFirstValue) || (amount == amountSolutionSecond && !this.chooseFirstValue)) {
-            this.setCheck(loc.getCommon().get("verifier_doubleamountnumber_check_thereare") + " " + getStringForValue(amount, loc) + " " + this.value + "s " + loc.getCommon().get("verifier_doubleamountnumber_check_or") + " " + this.secondValue + "s " + loc.getCommon().get("verifier_doubleamountnumber_check_incode"));
-        } else {
-            this.setCheck(loc.getCommon().get("verifier_doubleamountnumber_check_thereareNOT") + " " + getStringForValue(amount, loc) + " " + this.value + "s " + loc.getCommon().get("verifier_doubleamountnumber_check_or") + " " + this.secondValue + "s " + loc.getCommon().get("verifier_doubleamountnumber_check_incode"));
-        }
+        String op = check ? "=" : "!=";
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.value).append(" ").append(op).append(" ").append(amount).append("x");
+        sb.append(hitSeparator());
+        sb.append(this.secondValue).append(" ").append(op).append(" ").append(amountSecond).append("x");
+        this.setCheck(sb.toString());
 
-        if (chooseFirstValue) {
-            return amount == amountSolution;
-        } else {
-            return amountSecond == amountSolutionSecond;
-        }
+        return check;
     }
 
     private int getAmountFor(int value, int first, int second, int third) {

@@ -38,6 +38,23 @@ public class SumMultiplerValueVerifier extends Verifier {
     }
 
     @Override
+    public java.util.List<Verifier> getAllConfigurations(Solution sol) {
+        java.util.List<Verifier> list = new java.util.ArrayList<>();
+        list.add(new SumMultiplerValueVerifier(sol, 3));
+        list.add(new SumMultiplerValueVerifier(sol, 4));
+        list.add(new SumMultiplerValueVerifier(sol, 5));
+        return list;
+    }
+
+    @Override
+    public int[] getConfigCells() {
+        // value=3 → cell 0, value=4 → cell 1, value=5 → cell 2
+        if (this.value == 3) return new int[]{0};
+        if (this.value == 4) return new int[]{1};
+        return new int[]{2};
+    }
+
+    @Override
     public boolean check(int first, int second, int third) {
         return check(first, second, third, null, -1);
     }
@@ -45,38 +62,26 @@ public class SumMultiplerValueVerifier extends Verifier {
     @Override
     public boolean check(int first, int second, int third, ArrayList<Solution> possibleSolutions, int index) {
         com.apogames.logic.common.Localization loc = com.apogames.logic.common.Localization.getInstance();
-
         this.setCheck("");
 
         int sum = first + second + third;
+        boolean check = sum % this.value == 0 && getSolution().getSum() % this.value == 0;
 
-        String s = "";
-        if (sum % 3 == 0) {
-            s += "3";
+        int[] divisors = {3, 4, 5};
+        boolean[] hits = {sum % 3 == 0, sum % 4 == 0, sum % 5 == 0};
+        String multipleOf = loc.getCommon().get("verifier_summultiplervalue_check_isamultipleof");
+        String notWord = loc.getCommon().get("common_not");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < divisors.length; i++) {
+            if (!hits[i]) continue;
+            if (sb.length() > 0) sb.append(hitSeparator());
+            sb.append(sum).append(" ");
+            if (!check) sb.append(notWord).append(" ");
+            sb.append(multipleOf).append(" ").append(divisors[i]);
         }
-        if (sum % 4 == 0) {
-            if (s.length() != 0) {
-                s += " " + loc.getCommon().get("common_and") + " ";
-            }
-            s += "4";
-        }
-        if (sum % 5 == 0) {
-            if (s.length() != 0) {
-                s += " " + loc.getCommon().get("common_and") + " ";
-            }
-            s += "5";
-        }
+        this.setCheck(sb.toString());
 
-        if (sum % this.value == 0) {
-            if (getSolution().getSum() % this.value == 0) {
-                this.setCheck(sum + " " + loc.getCommon().get("verifier_summultiplervalue_check_isamultipleof") + " " + s);
-            } else {
-                this.setCheck(sum + " " + loc.getCommon().get("verifier_summultiplervalue_check_isamultipleof") + " " + s + " " + loc.getCommon().get("verifier_summultiplervalue_check_butwrong"));
-            }
-        } else {
-            this.setCheck(sum + " " + loc.getCommon().get("verifier_summultiplervalue_check_isamultipleof") + " " + s + " " + loc.getCommon().get("verifier_summultiplervalue_check_butwrong"));
-        }
-        return sum % this.value == 0 && getSolution().getSum() % this.value == 0;
+        return check;
     }
 
     @Override

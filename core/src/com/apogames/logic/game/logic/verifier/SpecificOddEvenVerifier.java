@@ -31,6 +31,23 @@ public class SpecificOddEvenVerifier extends Verifier {
     }
 
     @Override
+    public java.util.List<Verifier> getAllConfigurations(Solution sol) {
+        java.util.List<Verifier> list = new java.util.ArrayList<>();
+        list.add(new SpecificOddEvenVerifier(sol, true, false, false));
+        list.add(new SpecificOddEvenVerifier(sol, false, true, false));
+        list.add(new SpecificOddEvenVerifier(sol, false, false, true));
+        return list;
+    }
+
+    @Override
+    public int[] getConfigCells() {
+        // 2 rows × 3 cols. Konfig isFirst → col 0: cells 0 und 3.
+        if (isFirst()) return new int[]{0, 3};
+        if (isSecond()) return new int[]{1, 4};
+        return new int[]{2, 5};
+    }
+
+    @Override
     public boolean check(int first, int second, int third) {
         return check(first, second, third, null, -1);
     }
@@ -38,7 +55,6 @@ public class SpecificOddEvenVerifier extends Verifier {
     @Override
     public boolean check(int first, int second, int third, ArrayList<Solution> possibleSolutions, int index) {
         com.apogames.logic.common.Localization loc = com.apogames.logic.common.Localization.getInstance();
-
         this.setCheck("");
 
         boolean check = false;
@@ -50,26 +66,26 @@ public class SpecificOddEvenVerifier extends Verifier {
             check = third % 2 == getSolution().getThird() % 2;
         }
 
-        String firstString = getEvenOrOddString(first, loc);
-        String secondString = getEvenOrOddString(second, loc);
-        String thirdString = getEvenOrOddString(third, loc);
-
-        String result = "";
-        if (check) {
-            result += "first " + loc.getCommon().get("common_is") + " " + firstString + " " + loc.getCommon().get("common_or") + " second " + loc.getCommon().get("common_is") + " " + secondString + " " + loc.getCommon().get("common_or") + " third " + loc.getCommon().get("common_is") + " " + thirdString;
-        } else {
-            result += "first " + loc.getCommon().get("common_is") + " " + getOpposite(firstString, loc) + " " + loc.getCommon().get("common_or") + " second " + loc.getCommon().get("common_is") + " " + getOpposite(secondString, loc) + " " + loc.getCommon().get("common_or") + " third " + loc.getCommon().get("common_is") + " " + getOpposite(thirdString, loc);
+        String[] names = {"first", "second", "third"};
+        int[] vals = {first, second, third};
+        String isWord = loc.getCommon().get("common_is");
+        String even = loc.getCommon().get("common_even");
+        String odd = loc.getCommon().get("common_odd");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 3; i++) {
+            boolean isEven = vals[i] % 2 == 0;
+            String parity;
+            if (check) {
+                parity = isEven ? even : odd;
+            } else {
+                parity = isEven ? odd : even;
+            }
+            if (sb.length() > 0) sb.append(hitSeparator());
+            sb.append(names[i]).append(" ").append(isWord).append(" ").append(parity);
         }
-        this.setCheck(result);
+        this.setCheck(sb.toString());
 
         return check;
-    }
-
-    private String getOpposite(String firstString, com.apogames.logic.common.Localization loc) {
-        if (firstString.equals(loc.getCommon().get("common_even"))) {
-            return loc.getCommon().get("common_odd");
-        }
-        return loc.getCommon().get("common_even");
     }
 
     private String getEvenOrOddString(int number, com.apogames.logic.common.Localization loc) {

@@ -17,6 +17,11 @@ public abstract class Verifier {
 
     private final String REPLACEMENT_STRING = "    ";
 
+    /** Lokalisiertes " oder " als Trenner zwischen mehreren Hit-Bedingungen. */
+    public static String hitSeparator() {
+        return " " + Localization.getInstance().getCommon().get("common_or") + " ";
+    }
+
     private final float extraInformationWidth = (Constants.GAME_WIDTH - 805) / 2f - 15;
 
     private String verifier = "A";
@@ -221,46 +226,77 @@ public abstract class Verifier {
 
     public abstract Verifier getCopyWithSolution(Solution newSolution);
 
-    public void renderFillExtraInformation(MainPanel mainPanel, int changeX, int changeY, String check) {
-        if (check.contains("first") || check.contains("second") || check.contains("third")) {
-            int startX;
-            BitmapFont font15 = AssetLoader.font15;
-            int width = 17;
-            String replacementString = REPLACEMENT_STRING;
-            mainPanel.getGlyphLayout().setText(font15, check);
-            if (mainPanel.getGlyphLayout().width > extraInformationWidth) {
-                font15 = AssetLoader.font12;
-                width = 10;
+    /**
+     * Liefert alle möglichen Konfigurationen dieses Verifiers für eine hypothetische Lösung.
+     * Bei Verifeyern mit versteckter Konfig (die der Spieler aus den Antworten ableiten muss)
+     * sollte diese Methode überschrieben werden, damit der Solver alle möglichen Konfigs prüft.
+     * Default: nur die echte Konfiguration mit der gegebenen Solution.
+     */
+    public java.util.List<Verifier> getAllConfigurations(Solution sol) {
+        java.util.List<Verifier> list = new java.util.ArrayList<>();
+        list.add(getCopyWithSolution(sol));
+        return list;
+    }
+
+    /**
+     * Liefert die Layout-Cells, die diese Konfiguration im Verifier-Grid repräsentiert.
+     * Wird vom Solver benutzt, um ausgekreuzte (vom Spieler eliminierte) Konfigs zu verwerfen.
+     * Default: leer — Verifier ohne versteckte Konfig.
+     */
+    public int[] getConfigCells() {
+        return new int[0];
+    }
+
+    public int renderFillExtraInformation(MainPanel mainPanel, int changeX, int changeY, String check) {
+        return renderFillExtraInformation(mainPanel, changeX, changeY, check, Integer.MAX_VALUE);
+    }
+
+    public int renderFillExtraInformation(MainPanel mainPanel, int changeX, int changeY, String check, int maxLines) {
+        if (check == null || check.isEmpty()) {
+            return 0;
+        }
+        BitmapFont font = AssetLoader.font15;
+        int iconSize = 17;
+        java.util.List<String> lines = computeWrappedLines(mainPanel, check, font);
+        int linesToDraw = Math.min(lines.size(), Math.max(1, maxLines));
+        for (int i = 0; i < linesToDraw; i++) {
+            drawIconsForLine(mainPanel, font, iconSize, changeX, changeY + i * 20, lines.get(i));
+        }
+        return linesToDraw;
+    }
+
+    private void drawIconsForLine(MainPanel mainPanel, BitmapFont font, int iconSize, int changeX, int changeY, String line) {
+        if (!line.contains("first") && !line.contains("second") && !line.contains("third")) {
+            return;
+        }
+        String working = line;
+        int indexFirst = working.indexOf("first");
+        int indexSecond = working.indexOf("second");
+        int indexThird = working.indexOf("third");
+        while (indexFirst >= 0 || indexSecond >= 0 || indexThird >= 0) {
+            int chosenIcon;
+            int chosenIdx;
+            String token;
+            if (indexFirst >= 0 && (indexSecond < 0 || indexFirst < indexSecond) && (indexThird < 0 || indexFirst < indexThird)) {
+                chosenIcon = 1;
+                chosenIdx = indexFirst;
+                token = "first";
+            } else if (indexSecond >= 0 && (indexThird < 0 || indexSecond < indexThird)) {
+                chosenIcon = 2;
+                chosenIdx = indexSecond;
+                token = "second";
+            } else {
+                chosenIcon = 3;
+                chosenIdx = indexThird;
+                token = "third";
             }
-
-            String replaceCheck = check;
-            int indexFirst = replaceCheck.indexOf("first");
-            int indexSecond = replaceCheck.indexOf("second");
-            int indexThird = replaceCheck.indexOf("third");
-            while (indexFirst >= 0 || indexSecond >= 0 || indexThird >= 0) {
-                if (indexFirst >= 0 && (indexFirst < indexSecond || indexSecond < 0) && (indexFirst < indexThird || indexThird < 0)) {
-                    mainPanel.getGlyphLayout().setText(font15, replaceCheck.substring(0, indexFirst));
-                    startX = (int)(mainPanel.getGlyphLayout().width);
-                    replaceCheck = replaceCheck.replaceFirst("first", replacementString);
-
-                    IconDraw.renderIcon(mainPanel, changeX + startX, changeY, width, width, 1);
-                } else if (indexSecond >= 0 && (indexSecond < indexFirst || indexFirst < 0) && (indexSecond < indexThird || indexThird < 0)) {
-                    mainPanel.getGlyphLayout().setText(font15, replaceCheck.substring(0, indexSecond));
-                    startX = (int)(mainPanel.getGlyphLayout().width);
-                    replaceCheck = replaceCheck.replaceFirst("second", replacementString);
-
-                    IconDraw.renderIcon(mainPanel, changeX + startX, changeY, width, width, 2);
-                } else if (indexThird >= 0 && (indexThird < indexFirst || indexFirst < 0) && (indexThird < indexSecond || indexSecond < 0)) {
-                    mainPanel.getGlyphLayout().setText(font15, replaceCheck.substring(0, indexThird));
-                    startX = (int)(mainPanel.getGlyphLayout().width);
-                    replaceCheck = replaceCheck.replaceFirst("third", replacementString);
-
-                    IconDraw.renderIcon(mainPanel, changeX + startX, changeY, width, width, 3);
-                }
-                indexFirst = replaceCheck.indexOf("first");
-                indexSecond = replaceCheck.indexOf("second");
-                indexThird = replaceCheck.indexOf("third");
-            }
+            mainPanel.getGlyphLayout().setText(font, working.substring(0, chosenIdx));
+            int startX = (int) mainPanel.getGlyphLayout().width;
+            working = working.substring(0, chosenIdx) + REPLACEMENT_STRING + working.substring(chosenIdx + token.length());
+            IconDraw.renderIcon(mainPanel, changeX + startX, changeY, iconSize, iconSize, chosenIcon);
+            indexFirst = working.indexOf("first");
+            indexSecond = working.indexOf("second");
+            indexThird = working.indexOf("third");
         }
     }
 
@@ -278,20 +314,63 @@ public abstract class Verifier {
     public void renderTextBig(MainPanel mainPanel, int changeX, int changeY) {
     }
 
-    public void renderTextExtraInformation(MainPanel mainPanel, int changeX, int changeY, String check) {
-        String replaceCheck = check;
-        mainPanel.getGlyphLayout().setText(AssetLoader.font15, replaceCheck);
-        if (check.contains("first") || check.contains("second") || check.contains("third")) {
-            replaceCheck = check.replace("first", REPLACEMENT_STRING);
-            replaceCheck = replaceCheck.replace("second", REPLACEMENT_STRING);
-            replaceCheck = replaceCheck.replace("third", REPLACEMENT_STRING);
-        }
+    public int renderTextExtraInformation(MainPanel mainPanel, int changeX, int changeY, String check) {
+        return renderTextExtraInformation(mainPanel, changeX, changeY, check, Integer.MAX_VALUE);
+    }
 
-        if (mainPanel.getGlyphLayout().width >= extraInformationWidth) {
-            mainPanel.drawString(replaceCheck, changeX, changeY, Constants.COLOR_BUTTONS_DARK, AssetLoader.font12, DrawString.BEGIN, false, false);
-        } else {
-            mainPanel.drawString(replaceCheck, changeX, changeY, Constants.COLOR_BUTTONS_DARK, AssetLoader.font15, DrawString.BEGIN, false, false);
+    public int renderTextExtraInformation(MainPanel mainPanel, int changeX, int changeY, String check, int maxLines) {
+        if (check == null || check.isEmpty()) {
+            return 0;
         }
+        BitmapFont font = AssetLoader.font15;
+        java.util.List<String> lines = computeWrappedLines(mainPanel, check, font);
+        int linesToDraw = Math.min(lines.size(), Math.max(1, maxLines));
+        for (int i = 0; i < linesToDraw; i++) {
+            String replaced = lines.get(i)
+                    .replace("first", REPLACEMENT_STRING)
+                    .replace("second", REPLACEMENT_STRING)
+                    .replace("third", REPLACEMENT_STRING);
+            mainPanel.drawString(replaced, changeX, changeY + i * 20, Constants.COLOR_BUTTONS_DARK, font, DrawString.BEGIN, false, false);
+        }
+        return linesToDraw;
+    }
+
+    public int countWrappedLines(MainPanel mainPanel, String check) {
+        if (check == null || check.isEmpty()) {
+            return 0;
+        }
+        return computeWrappedLines(mainPanel, check, AssetLoader.font15).size();
+    }
+
+    private java.util.List<String> computeWrappedLines(MainPanel mainPanel, String check, BitmapFont font) {
+        java.util.List<String> lines = new java.util.ArrayList<>();
+        if (textWidth(mainPanel, font, check) <= extraInformationWidth) {
+            lines.add(check);
+            return lines;
+        }
+        String[] words = check.split(" ");
+        StringBuilder cur = new StringBuilder();
+        for (String word : words) {
+            if (word.isEmpty()) continue;
+            String candidate = cur.length() == 0 ? word : cur + " " + word;
+            if (textWidth(mainPanel, font, candidate) <= extraInformationWidth || cur.length() == 0) {
+                cur.setLength(0);
+                cur.append(candidate);
+            } else {
+                lines.add(cur.toString());
+                cur.setLength(0);
+                cur.append(word);
+            }
+        }
+        if (cur.length() > 0) {
+            lines.add(cur.toString());
+        }
+        return lines;
+    }
+
+    private float textWidth(MainPanel mainPanel, BitmapFont font, String text) {
+        mainPanel.getGlyphLayout().setText(font, text);
+        return mainPanel.getGlyphLayout().width;
     }
 
     public abstract int getId();

@@ -30,6 +30,22 @@ public class SpecificSmallerEqualOtherVerifier extends Verifier {
     }
 
     @Override
+    public java.util.List<Verifier> getAllConfigurations(Solution sol) {
+        java.util.List<Verifier> list = new java.util.ArrayList<>();
+        list.add(new SpecificSmallerEqualOtherVerifier(sol, true, false, false));
+        list.add(new SpecificSmallerEqualOtherVerifier(sol, false, true, false));
+        list.add(new SpecificSmallerEqualOtherVerifier(sol, false, false, true));
+        return list;
+    }
+
+    @Override
+    public int[] getConfigCells() {
+        if (isFirst()) return new int[]{0};
+        if (isSecond()) return new int[]{1};
+        return new int[]{2};
+    }
+
+    @Override
     public boolean check(int first, int second, int third) {
         return check(first, second, third, null, -1);
     }
@@ -37,7 +53,6 @@ public class SpecificSmallerEqualOtherVerifier extends Verifier {
     @Override
     public boolean check(int first, int second, int third, ArrayList<Solution> possibleSolutions, int index) {
         com.apogames.logic.common.Localization loc = com.apogames.logic.common.Localization.getInstance();
-
         this.setCheck("");
 
         boolean check = false;
@@ -58,26 +73,19 @@ public class SpecificSmallerEqualOtherVerifier extends Verifier {
                     && getSolution().getThird() <= getSolution().getFirst();
         }
 
-        boolean firstSmallest = first <= second && first <= third;
-        boolean secondSmallest = second <= first && second <= third;
-
-        if (check) {
-            if (firstSmallest) {
-                this.setCheck("first " + loc.getCommon().get("common_issmallest") + " " + loc.getCommon().get("common_or") + " second " + loc.getCommon().get("common_or") + " third " + loc.getCommon().get("common_arenotsmallest"));
-            } else if (secondSmallest) {
-                this.setCheck("second " + loc.getCommon().get("common_issmallest") + " " + loc.getCommon().get("common_or") + " first " + loc.getCommon().get("common_or") + " third " + loc.getCommon().get("common_arenotsmallest"));
-            } else {
-                this.setCheck("third " + loc.getCommon().get("common_issmallest") + " " + loc.getCommon().get("common_or") + " first " + loc.getCommon().get("common_or") + " second " + loc.getCommon().get("common_arenotsmallest"));
-            }
-        } else {
-            if (firstSmallest) {
-                this.setCheck("first " + loc.getCommon().get("common_isnotsmallest") + " " + loc.getCommon().get("common_or") + " second " + loc.getCommon().get("common_or") + " third " + loc.getCommon().get("common_aresmallest"));
-            } else if (secondSmallest) {
-                this.setCheck("second " + loc.getCommon().get("common_isnotsmallest") + " " + loc.getCommon().get("common_or") + " first " + loc.getCommon().get("common_or") + " third " + loc.getCommon().get("common_aresmallest"));
-            } else {
-                this.setCheck("third " + loc.getCommon().get("common_isnotsmallest") + " " + loc.getCommon().get("common_or") + " first " + loc.getCommon().get("common_or") + " second " + loc.getCommon().get("common_aresmallest"));
-            }
+        String[] names = {"first", "second", "third"};
+        boolean[] hits = {
+                first <= second && first <= third,
+                second <= first && second <= third,
+                third <= first && third <= second};
+        String word = loc.getCommon().get(check ? "common_issmallest" : "common_isnotsmallest");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 3; i++) {
+            if (!hits[i]) continue;
+            if (sb.length() > 0) sb.append(hitSeparator());
+            sb.append(names[i]).append(" ").append(word);
         }
+        this.setCheck(sb.toString());
 
         return check;
     }

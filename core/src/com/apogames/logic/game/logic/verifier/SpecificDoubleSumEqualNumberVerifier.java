@@ -33,6 +33,24 @@ public class SpecificDoubleSumEqualNumberVerifier extends Verifier {
         return verifier;
     }
 
+    @Override
+    public java.util.List<Verifier> getAllConfigurations(Solution sol) {
+        java.util.List<Verifier> list = new java.util.ArrayList<>();
+        // Drei mögliche Paare: (first,second), (first,third), (second,third)
+        list.add(new SpecificDoubleSumEqualNumberVerifier(sol, true, true, false, this.value));
+        list.add(new SpecificDoubleSumEqualNumberVerifier(sol, true, false, true, this.value));
+        list.add(new SpecificDoubleSumEqualNumberVerifier(sol, false, true, true, this.value));
+        return list;
+    }
+
+    @Override
+    public int[] getConfigCells() {
+        // cell 0 = first+second, cell 1 = first+third, cell 2 = second+third
+        if (isFirst() && isSecond()) return new int[]{0};
+        if (isFirst() && isThird()) return new int[]{1};
+        return new int[]{2};
+    }
+
     public int getValue() {
         return value;
     }
@@ -44,8 +62,6 @@ public class SpecificDoubleSumEqualNumberVerifier extends Verifier {
 
     @Override
     public boolean check(int first, int second, int third, ArrayList<Solution> possibleSolutions, int index) {
-        com.apogames.logic.common.Localization loc = com.apogames.logic.common.Localization.getInstance();
-
         int sum = first + second;
         int sumResult = getSolution().getFirst() + getSolution().getSecond();
         if (isFirst()) {
@@ -60,44 +76,19 @@ public class SpecificDoubleSumEqualNumberVerifier extends Verifier {
 
         boolean check = sum == this.value && sumResult == this.value;
 
-        this.setCheck("");
-
-        String result = "";
-        if (check) {
-            if (first + second == this.value) {
-                result += "first + second = "+this.value;
-            } else {
-                result += "first + second != "+this.value;
-            }
-            if (third + second == this.value) {
-                result += " " + loc.getCommon().get("common_or") + " second + third = "+this.value;
-            } else {
-                result += " " + loc.getCommon().get("common_or") + " second + third != "+this.value;
-            }
-            if (third + first == this.value) {
-                result += " " + loc.getCommon().get("common_or") + " first + third = "+this.value;
-            } else {
-                result += " " + loc.getCommon().get("common_or") + " first + third != "+this.value;
-            }
-        } else {
-            if (first + second == this.value) {
-                result += "first + second != "+this.value;
-            } else {
-                result += "first + second = "+this.value;
-            }
-            if (third + second == this.value) {
-                result += " " + loc.getCommon().get("common_or") + " second + third != "+this.value;
-            } else {
-                result += " " + loc.getCommon().get("common_or") + " second + third = "+this.value;
-            }
-            if (third + first == this.value) {
-                result += " " + loc.getCommon().get("common_or") + " first + third != "+this.value;
-            } else {
-                result += " " + loc.getCommon().get("common_or") + " first + third = "+this.value;
-            }
+        String[] pairLabels = {"first + second", "first + third", "second + third"};
+        boolean[] hits = {
+                first + second == this.value,
+                first + third == this.value,
+                second + third == this.value};
+        String op = check ? "=" : "!=";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 3; i++) {
+            if (!hits[i]) continue;
+            if (sb.length() > 0) sb.append(hitSeparator());
+            sb.append(pairLabels[i]).append(" ").append(op).append(" ").append(this.value);
         }
-
-        this.setCheck(result);
+        this.setCheck(sb.toString());
 
         return check;
     }

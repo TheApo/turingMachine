@@ -42,6 +42,8 @@ public class Logic extends SequentiallyThinkingScreenModel {
 
     public static final String FUNCTION_VERIFIER_START = "verifeyer_";
 
+    private static final int MAX_HELP_LINES = 6;
+
     private final int width = 400;
     private final int height = 200;
     private final int startX = 5;
@@ -334,7 +336,7 @@ public class Logic extends SequentiallyThinkingScreenModel {
         }
 
         this.stillPossibleSolutions.clear();
-        this.stillPossibleSolutions = new ApoSolver().getPossibleGuessesForTipps(this.level);
+        this.stillPossibleSolutions = new ApoSolver().getPossibleGuessesForTipps(this.level, collectExcludedCells());
 
         if (count >= 3) {
             ArrayList<ApoButton> buttonByStartingFunction = this.getButtonByStartingFunction(FUNCTION_VERIFIER);
@@ -343,6 +345,23 @@ public class Logic extends SequentiallyThinkingScreenModel {
             }
             this.nextStep();
         }
+    }
+
+    private java.util.Map<Integer, java.util.Set<Integer>> collectExcludedCells() {
+        java.util.Map<Integer, java.util.Set<Integer>> excluded = new java.util.HashMap<>();
+        for (int v = 0; v < this.level.getVerifiers().size(); v++) {
+            Verifier verifier = this.level.getVerifiers().get(v);
+            int totalCells = verifier.getRows() * verifier.getColumn();
+            java.util.Set<Integer> cells = new java.util.HashSet<>();
+            for (int cell = 0; cell < totalCells; cell++) {
+                ApoButton btn = getMainPanel().getButtonByFunction(FUNCTION_VERIFIER_START + v + "_" + cell);
+                if (btn != null && btn.isSelect()) {
+                    cells.add(cell);
+                }
+            }
+            excluded.put(v, cells);
+        }
+        return excluded;
     }
 
     protected void nextStep() {
@@ -505,10 +524,16 @@ public class Logic extends SequentiallyThinkingScreenModel {
 
             for (int index = 0; index < this.level.getVerifiers().size(); index++) {
                 addY = 25;
+                int linesUsed = 0;
                 for (int i = 0; i < this.level.getRounds().length; i++) {
                     if (this.level.getRounds()[i] != null && this.level.getRounds()[i].getTipp()[index] != null && this.level.getRounds()[i].getTipp()[index].length() > 0) {
-                        this.level.getVerifiers().get(index).renderFillExtraInformation(getMainPanel(), x + 10, y + 10 + addY, this.level.getRounds()[i].getTipp()[index]);
-                        addY += 20;
+                        int remaining = MAX_HELP_LINES - linesUsed;
+                        if (remaining <= 0) {
+                            break;
+                        }
+                        int linesDrawn = this.level.getVerifiers().get(index).renderFillExtraInformation(getMainPanel(), x + 10, y + 10 + addY, this.level.getRounds()[i].getTipp()[index], remaining);
+                        addY += 20 * linesDrawn;
+                        linesUsed += linesDrawn;
                     }
                 }
 
@@ -574,11 +599,16 @@ public class Logic extends SequentiallyThinkingScreenModel {
             for (int index = 0; index < this.level.getVerifiers().size(); index++) {
                 getMainPanel().drawString(Localization.getInstance().getCommon().get("verifier") + " " + (char) (index + 65), x + 5, y + 10, Constants.COLOR_BUTTONS_DARK, AssetLoader.font25, DrawString.BEGIN, false, false);
                 addY = 25;
+                int linesUsed = 0;
                 for (int i = 0; i < this.level.getRounds().length; i++) {
                     if (this.level.getRounds()[i] != null && this.level.getRounds()[i].getTipp()[index] != null && this.level.getRounds()[i].getTipp()[index].length() > 0) {
-                        this.level.getVerifiers().get(index).renderTextExtraInformation(getMainPanel(), x + 10, y + 10 + addY, this.level.getRounds()[i].getTipp()[index]);
-                        //getMainPanel().drawString(this.level.getRounds()[i].getTipp()[index], x + 10, y + 10 + addY, Constants.COLOR_BUTTONS_DARK, AssetLoader.font15, DrawString.BEGIN, false, false);
-                        addY += 20;
+                        int remaining = MAX_HELP_LINES - linesUsed;
+                        if (remaining <= 0) {
+                            break;
+                        }
+                        int linesDrawn = this.level.getVerifiers().get(index).renderTextExtraInformation(getMainPanel(), x + 10, y + 10 + addY, this.level.getRounds()[i].getTipp()[index], remaining);
+                        addY += 20 * linesDrawn;
+                        linesUsed += linesDrawn;
                     }
                 }
 

@@ -34,6 +34,21 @@ public class IsSmallestOrLargestVerifier extends Verifier {
     }
 
     @Override
+    public java.util.List<Verifier> getAllConfigurations(Solution sol) {
+        java.util.List<Verifier> list = new java.util.ArrayList<>();
+        list.add(new IsSmallestOrLargestVerifier(sol, true));
+        list.add(new IsSmallestOrLargestVerifier(sol, false));
+        return list;
+    }
+
+    @Override
+    public int[] getConfigCells() {
+        // 2 rows × 3 cols. smallest=true → row 0 (cells 0,1,2), smallest=false → row 1 (cells 3,4,5)
+        if (this.smallest) return new int[]{0, 1, 2};
+        return new int[]{3, 4, 5};
+    }
+
+    @Override
     public boolean check(int first, int second, int third) {
         return check(first, second, third, null, -1);
     }
@@ -66,26 +81,30 @@ public class IsSmallestOrLargestVerifier extends Verifier {
         }
 
         com.apogames.logic.common.Localization loc = com.apogames.logic.common.Localization.getInstance();
+        String[] names = {"first", "second", "third"};
+        boolean[] smallestHits = {
+                first < second && first < third,
+                second < first && second < third,
+                third < first && third < second};
+        boolean[] biggestHits = {
+                first > second && first > third,
+                second > first && second > third,
+                third > first && third > second};
+        String smallestWord = loc.getCommon().get(check ? "common_issmallest" : "common_isnotsmallest");
+        String biggestWord = loc.getCommon().get(check ? "common_isbiggest" : "common_isnotbiggest");
 
-        String result = "";
-        if (check) {
-            if ((first < second && first < third) || (first > second && first > third)) {
-                result += "first " + loc.getCommon().get("verifier_issmallestorlargest_check_correct");
-            } else {
-                result += "first " + loc.getCommon().get("verifier_issmallestorlargest_check_notcorrect");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 3; i++) {
+            if (smallestHits[i]) {
+                if (sb.length() > 0) sb.append(hitSeparator());
+                sb.append(names[i]).append(" ").append(smallestWord);
             }
-            if ((second < first && second < third) || (second > first && second > third)) {
-                result += "second " + loc.getCommon().get("verifier_issmallestorlargest_check_correct");
-            } else {
-                result += "second " + loc.getCommon().get("verifier_issmallestorlargest_check_notcorrect");
-            }
-            if ((third < first && third < second) || (third > first && third > second)) {
-                result += "third " + loc.getCommon().get("verifier_issmallestorlargest_check_correct");
-            } else {
-                result += "third " + loc.getCommon().get("verifier_issmallestorlargest_check_notcorrect");
+            if (biggestHits[i]) {
+                if (sb.length() > 0) sb.append(hitSeparator());
+                sb.append(names[i]).append(" ").append(biggestWord);
             }
         }
-        this.setCheck(result);
+        this.setCheck(sb.toString());
         return check;
     }
 

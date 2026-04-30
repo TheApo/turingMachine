@@ -31,55 +31,111 @@ public class ApoSolver {
     }
 
     public ArrayList<Solution> getPossibleGuessesForTipps(Level level) {
+        return getPossibleGuessesForTipps(level, java.util.Collections.emptyMap());
+    }
+
+    public ArrayList<Solution> getPossibleGuessesForTipps(Level level, java.util.Map<Integer, java.util.Set<Integer>> excludedCells) {
         fillPossibleGuesses();
-//        System.out.println("=== ApoSolver: Start mit " + this.possibleGuesses.size() + " möglichen Lösungen ===");
-        for (int round = 0; round <= level.getRounds().length && round <= level.getCurRound(); round++) {
-            Round curRound = level.getRounds()[round];
-            for (int verifey = 0; verifey < level.getVerifiers().size(); verifey++) {
+
+        int lastRound = Math.min(level.getCurRound(), level.getRounds().length - 1);
+
+        for (int j = this.possibleGuesses.size() - 1; j >= 0; j--) {
+            Solution solution = this.possibleGuesses.get(j);
+            boolean solutionConsistent = true;
+            for (int verifey = 0; verifey < level.getVerifiers().size() && solutionConsistent; verifey++) {
                 Verifier verifier = level.getVerifiers().get(verifey);
-                if (curRound.getVerifier()[verifey] != null) {
-                    int beforeSize = this.possibleGuesses.size();
-                    for (int j = this.possibleGuesses.size() - 1; j >= 0; j--) {
-                        if (j >= this.possibleGuesses.size()) {
-                            continue;
-                        }
-                        Solution solution = this.possibleGuesses.get(j);
-                        int sizeBeforeCheck = this.possibleGuesses.size();
+                java.util.Set<Integer> excluded = excludedCells.getOrDefault(verifey, java.util.Collections.emptySet());
 
-                        // Echte Antwort: Was hat der Verifier auf den Guess geantwortet?
-                        boolean orgGuess = verifier.check(curRound.getGuess().getFirst(), curRound.getGuess().getSecond(), curRound.getGuess().getThird(), this.possibleGuesses, j);
+                // Sammle alle Antworten dieses Verifiers über alle Runden
+                java.util.List<int[]> guesses = new java.util.ArrayList<>();
+                java.util.List<Boolean> answers = new java.util.ArrayList<>();
+                for (int r = 0; r <= lastRound; r++) {
+                    Round round = level.getRounds()[r];
+                    if (round == null || round.getGuess() == null) continue;
+                    Boolean ans = round.getVerifier()[verifey];
+                    if (ans == null) continue;
+                    guesses.add(new int[]{ round.getGuess().getFirst(), round.getGuess().getSecond(), round.getGuess().getThird() });
+                    answers.add(ans);
+                }
+                if (answers.isEmpty()) continue;
 
-                        // Prüfe ob verifier.check() die Liste bereits modifiziert hat
-                        if (this.possibleGuesses.size() != sizeBeforeCheck) {
-                            // Liste wurde bereits modifiziert, Index anpassen
-                            continue;
-                        }
-
-                        // Simuliere: Wenn possibleSolution die echte Lösung wäre, was würde der Verifier auf den Guess antworten?
-                        Verifier tempVerifier = verifier.getCopyWithSolution(solution);
-                        boolean wouldAnswer = tempVerifier.check(curRound.getGuess().getFirst(), curRound.getGuess().getSecond(), curRound.getGuess().getThird());
-
-                        // Wenn die simulierte Antwort anders ist als die echte Antwort → possibleSolution kann nicht die Lösung sein
-                        if (wouldAnswer != orgGuess) {
-                            if (j < this.possibleGuesses.size() && this.possibleGuesses.get(j).equals(solution)) {
-                                this.possibleGuesses.remove(j);
-                            }
-                        }
+                // Echte Verifier-Konfig + Lösung: simuliere ob die Antworten konsistent sind.
+                Verifier echteKonfig = verifier.getCopyWithSolution(solution);
+                boolean answersOk = true;
+                for (int i = 0; i < guesses.size(); i++) {
+                    int[] g = guesses.get(i);
+                    boolean simulated = echteKonfig.check(g[0], g[1], g[2]);
+                    if (simulated != answers.get(i)) {
+                        answersOk = false;
+                        break;
                     }
-//                    int afterSize = this.possibleGuesses.size();
-//                    if (beforeSize != afterSize) {
-//                        System.out.println("Runde " + (round + 1) + ", Verifier " + (char)('A' + verifey) + ": " + beforeSize + " -> " + afterSize + " Lösungen");
-//                    }
+                }
+                if (!answersOk) {
+                    solutionConsistent = false;
+                    continue;
+                }
+
+                // Auto-X-Subset-Check: die Cells, die Auto-X für diese Lösung mit der echten
+                // Konfig auskreuzt, müssen Subset der tatsächlich ausgekreuzten sein. Manuelle
+                // zusätzliche Auskreuzungen des Spielers sind erlaubt — fehlende Auto-X-Cells
+                // bedeuten dagegen, dass die Lösung nicht zu den Auskreuzungen passt.
+                if (!excluded.isEmpty()) {
+                    java.util.Set<Integer> simulated = simulateAutoX(echteKonfig, guesses, answers);
+                    if (!excluded.containsAll(simulated)) {
+                        solutionConsistent = false;
+                    }
+                }
+            }
+            if (!solutionConsistent) {
+                this.possibleGuesses.remove(j);
+            }
+        }
+
+        return this.possibleGuesses;
+    }
+
+    /**
+     * Simuliert welche Cells der Auto-X-Helfer für die gegebene Hypothese-Konfig
+     * ausgekreuzt hätte: bei JA-Antwort werden alle NICHT-Hit-Cells ausgekreuzt,
+     * bei NEIN-Antwort die Hit-Cells.
+     */
+    private java.util.Set<Integer> simulateAutoX(Verifier config, java.util.List<int[]> guesses, java.util.List<Boolean> answers) {
+        java.util.Set<Integer> simulated = new java.util.HashSet<>();
+        int totalCells = config.getRows() * config.getColumn();
+        for (int i = 0; i < guesses.size(); i++) {
+            int[] g = guesses.get(i);
+            int[] hits = config.getCellsForGuess(g[0], g[1], g[2]);
+            java.util.Set<Integer> hitSet = new java.util.HashSet<>();
+            for (int h : hits) hitSet.add(h);
+            if (answers.get(i)) {
+                for (int c = 0; c < totalCells; c++) {
+                    if (!hitSet.contains(c)) simulated.add(c);
+                }
+            } else {
+                simulated.addAll(hitSet);
+            }
+        }
+        return simulated;
+    }
+
+    /**
+     * Eine Konfig ist trivial wenn sie über alle 125 möglichen Guesses entweder
+     * immer JA oder immer NEIN antwortet — sie liefert dann keine Information und
+     * würde vom Level-Generator nicht gewählt werden.
+     */
+    private boolean isTrivialConfig(Verifier config) {
+        boolean canYes = false;
+        boolean canNo = false;
+        for (int f = 1; f <= 5; f++) {
+            for (int s = 1; s <= 5; s++) {
+                for (int t = 1; t <= 5; t++) {
+                    if (config.check(f, s, t)) canYes = true;
+                    else canNo = true;
+                    if (canYes && canNo) return false;
                 }
             }
         }
-//        System.out.println("Verbleibende mögliche Lösungen (" + this.possibleGuesses.size() + "):");
-//        for (Solution sol : this.possibleGuesses) {
-//            System.out.println("  " + sol.getSolutionString());
-//        }
-//        System.out.println("Echte Lösung: " + level.getSolution().getSolutionString());
-//        System.out.println("===");
-        return this.possibleGuesses;
+        return true;
     }
 
     public Level getNextLevel(int amount, Difficulty difficulty) {

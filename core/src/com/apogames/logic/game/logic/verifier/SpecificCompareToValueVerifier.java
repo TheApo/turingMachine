@@ -33,6 +33,23 @@ public class SpecificCompareToValueVerifier extends Verifier {
         return verifier;
     }
 
+    @Override
+    public java.util.List<Verifier> getAllConfigurations(Solution sol) {
+        java.util.List<Verifier> list = new java.util.ArrayList<>();
+        list.add(new SpecificCompareToValueVerifier(sol, true, false, false, this.value));
+        list.add(new SpecificCompareToValueVerifier(sol, false, true, false, this.value));
+        list.add(new SpecificCompareToValueVerifier(sol, false, false, true, this.value));
+        return list;
+    }
+
+    @Override
+    public int[] getConfigCells() {
+        // 3x3 grid: cell = row*3 + col. Konfig isFirst → erste Spalte (col=0): cells 0, 3, 6.
+        if (isFirst()) return new int[]{0, 3, 6};
+        if (isSecond()) return new int[]{1, 4, 7};
+        return new int[]{2, 5, 8};
+    }
+
     public int getValue() {
         return value;
     }
@@ -44,8 +61,6 @@ public class SpecificCompareToValueVerifier extends Verifier {
 
     @Override
     public boolean check(int first, int second, int third, ArrayList<Solution> possibleSolutions, int index) {
-        com.apogames.logic.common.Localization loc = com.apogames.logic.common.Localization.getInstance();
-
         boolean check = false;
         if (isFirst()) {
             if (first < this.value) {
@@ -75,33 +90,20 @@ public class SpecificCompareToValueVerifier extends Verifier {
             }
         }
 
-        this.setCheck("");
-
-        String result = "";
-        if (check) {
-            if (first < this.value) {
-                result += "first < "+this.value;
-            } else if (first == this.value) {
-                result += "first = "+this.value;
+        String[] names = {"first", "second", "third"};
+        int[] vals = {first, second, third};
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 3; i++) {
+            String op;
+            if (check) {
+                op = vals[i] < this.value ? "<" : (vals[i] == this.value ? "=" : ">");
             } else {
-                result += "first > "+this.value;
+                op = vals[i] < this.value ? ">=" : (vals[i] == this.value ? "!=" : "<=");
             }
-            if (second < this.value) {
-                result += " " + loc.getCommon().get("common_or") + " second < "+this.value;
-            } else if (second == this.value) {
-                result += " " + loc.getCommon().get("common_or") + " second = "+this.value;
-            } else {
-                result += " " + loc.getCommon().get("common_or") + " second > "+this.value;
-            }
-            if (third < this.value) {
-                result += " " + loc.getCommon().get("common_or") + " third < "+this.value;
-            } else if (third == this.value) {
-                result += " " + loc.getCommon().get("common_or") + " third = "+this.value;
-            } else {
-                result += " " + loc.getCommon().get("common_or") + " third > "+this.value;
-            }
+            if (sb.length() > 0) sb.append(hitSeparator());
+            sb.append(names[i]).append(" ").append(op).append(" ").append(this.value);
         }
-        this.setCheck(result);
+        this.setCheck(sb.toString());
 
         return check;
     }
