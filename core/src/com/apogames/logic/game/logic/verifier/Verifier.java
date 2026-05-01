@@ -344,7 +344,7 @@ public abstract class Verifier {
 
     private java.util.List<String> computeWrappedLines(MainPanel mainPanel, String check, BitmapFont font) {
         java.util.List<String> lines = new java.util.ArrayList<>();
-        if (textWidth(mainPanel, font, check) <= extraInformationWidth) {
+        if (renderedWidth(mainPanel, font, check) <= extraInformationWidth) {
             lines.add(check);
             return lines;
         }
@@ -353,7 +353,7 @@ public abstract class Verifier {
         for (String word : words) {
             if (word.isEmpty()) continue;
             String candidate = cur.length() == 0 ? word : cur + " " + word;
-            if (textWidth(mainPanel, font, candidate) <= extraInformationWidth || cur.length() == 0) {
+            if (renderedWidth(mainPanel, font, candidate) <= extraInformationWidth || cur.length() == 0) {
                 cur.setLength(0);
                 cur.append(candidate);
             } else {
@@ -371,6 +371,19 @@ public abstract class Verifier {
     private float textWidth(MainPanel mainPanel, BitmapFont font, String text) {
         mainPanel.getGlyphLayout().setText(font, text);
         return mainPanel.getGlyphLayout().width;
+    }
+
+    /**
+     * Breite des Strings nach dem Token-Replacement ("first"/"second"/"third" → REPLACEMENT_STRING),
+     * also die tatsächliche Render-Breite. Roh-Breite wäre zu groß weil "first" (5 Zeichen) deutlich
+     * breiter ist als die 4 Replacement-Spaces, hinter denen das Icon liegt.
+     */
+    private float renderedWidth(MainPanel mainPanel, BitmapFont font, String text) {
+        String rendered = text
+                .replace("first", REPLACEMENT_STRING)
+                .replace("second", REPLACEMENT_STRING)
+                .replace("third", REPLACEMENT_STRING);
+        return textWidth(mainPanel, font, rendered);
     }
 
     public abstract int getId();

@@ -42,7 +42,7 @@ public class Logic extends SequentiallyThinkingScreenModel {
 
     public static final String FUNCTION_VERIFIER_START = "verifeyer_";
 
-    private static final int MAX_HELP_LINES = 6;
+    private static final int MAX_HELP_LINES = 5;
 
     private final int width = 400;
     private final int height = 200;

@@ -83,7 +83,48 @@ public class ApoSolver {
                     java.util.Set<Integer> simulated = simulateAutoX(echteKonfig, guesses, answers);
                     if (!excluded.containsAll(simulated)) {
                         solutionConsistent = false;
+                        continue;
                     }
+                }
+
+                // Cell-basierter Konsistenz-Check: Auto-X arbeitet mit der Annahme
+                // "Regel-Cell c gilt für die Lösung" (hit_solution[c] = true). Damit asymmetrische
+                // Verifeyer (z.B. SpecificSmallerValueVerifier) korrekt einschränken: für jeden
+                // Verifeyer muss es mindestens eine nicht-ausgekreuzte Cell c geben, die der
+                // Kandidat C trifft UND die mit allen Antworten konsistent ist
+                // ((c ∈ hits_guess) == observed für jede Runde).
+                int totalCells = verifier.getRows() * verifier.getColumn();
+                int[] hitsCArr = verifier.getCellsForGuess(solution.getFirst(), solution.getSecond(), solution.getThird());
+                java.util.Set<Integer> hitsC = new java.util.HashSet<>();
+                for (int h : hitsCArr) hitsC.add(h);
+
+                java.util.List<java.util.Set<Integer>> hitsPerRound = new java.util.ArrayList<>();
+                for (int[] g : guesses) {
+                    int[] h = verifier.getCellsForGuess(g[0], g[1], g[2]);
+                    java.util.Set<Integer> set = new java.util.HashSet<>();
+                    for (int hh : h) set.add(hh);
+                    hitsPerRound.add(set);
+                }
+
+                boolean foundValidCell = false;
+                for (int c = 0; c < totalCells; c++) {
+                    if (excluded.contains(c)) continue;
+                    if (!hitsC.contains(c)) continue;
+                    boolean cellOk = true;
+                    for (int i = 0; i < guesses.size(); i++) {
+                        boolean hitGuess = hitsPerRound.get(i).contains(c);
+                        if (hitGuess != answers.get(i)) {
+                            cellOk = false;
+                            break;
+                        }
+                    }
+                    if (cellOk) {
+                        foundValidCell = true;
+                        break;
+                    }
+                }
+                if (!foundValidCell) {
+                    solutionConsistent = false;
                 }
             }
             if (!solutionConsistent) {
